@@ -1,0 +1,90 @@
+/*cria um spinner button, coloca min 2 max sla e reverencia uma coluna para o indice*/
+
+Sub AtualizarFormulario()
+    Dim wsP As Worksheet
+    Dim wsA As Worksheet
+    Dim indice As Long
+    Dim ultimaLinha As Long
+    
+    Set wsP = ThisWorkbook.Sheets("Formulario")
+    Set wsA = ThisWorkbook.Sheets("Apoio")
+    
+    ' Valor atual do SpinButton (célula vinculada H1)
+    indice = wsP.Range("H1").Value
+    
+    ' Última linha em Apoio
+    ultimaLinha = wsA.Cells(wsA.Rows.Count, "A").End(xlUp).Row
+    
+    ' Se índice menor que 2, ajusta para 2
+    If indice < 2 Then
+        indice = 2
+        wsP.Range("H1").Value = indice
+    End If
+    
+    ' Se índice maior que última linha, trava e mostra mensagem
+    If indice > ultimaLinha Then
+        MsgBox "Fim da lista!"
+        indice = ultimaLinha
+        wsP.Range("H1").Value = indice
+    End If
+    
+    ' Atualiza os mesclados
+    wsP.Range("A1:D1").Value = wsA.Cells(indice, 1).Value
+    wsP.Range("A2:D2").Value = wsA.Cells(indice, 2).Value
+End Sub
+Sub CopiarParaBD()
+    Dim wsForm As Worksheet
+    Dim wsApoio As Worksheet
+    Dim wsBD As Worksheet
+    Dim ultimaLinhaBD As Long
+    Dim ultimaLinhaApoio As Long
+    Dim i As Long
+    Dim colunaBD As Long
+    
+    Set wsForm = ThisWorkbook.Sheets("Formulario")
+    Set wsApoio = ThisWorkbook.Sheets("Apoio")
+    Set wsBD = ThisWorkbook.Sheets("BD")
+    
+    ' Encontra a primeira linha vazia na planilha BD
+    ultimaLinhaBD = wsBD.Cells(wsBD.Rows.Count, "A").End(xlUp).Row + 1
+    
+    ' Copia A4 e B4 do Formulário para BD
+    wsBD.Cells(ultimaLinhaBD, "A").Value = wsForm.Range("A4").Value
+    wsBD.Cells(ultimaLinhaBD, "B").Value = wsForm.Range("B4").Value
+    
+    ' Descobre a última linha preenchida na coluna C da Apoio
+    ultimaLinhaApoio = wsApoio.Cells(wsApoio.Rows.Count, "C").End(xlUp).Row
+    
+    ' Começa a copiar as respostas na BD a partir da coluna C
+    colunaBD = 3 ' coluna C
+    For i = 1 To ultimaLinhaApoio
+        If wsApoio.Cells(i, "C").Value <> "" Then
+            wsBD.Cells(ultimaLinhaBD, colunaBD).Value = wsApoio.Cells(i, "C").Value
+            colunaBD = colunaBD + 1
+        End If
+    Next i
+    
+    MsgBox "Dados copiados para BD com sucesso!"
+    Call LimparFormulario
+End Sub
+
+Sub LimparFormulario()
+    Dim wsForm As Worksheet
+    Dim wsApoio As Worksheet
+    Dim ultimaLinhaApoio As Long
+    
+    Set wsForm = ThisWorkbook.Sheets("Formulario")
+    Set wsApoio = ThisWorkbook.Sheets("Apoio")
+    
+    ' Limpa A4 e B4 do formulário
+    wsForm.Range("A4:B4").ClearContents
+    
+    ' Limpa os valores preenchidos na coluna C da Apoio
+    ultimaLinhaApoio = wsApoio.Cells(wsApoio.Rows.Count, "C").End(xlUp).Row
+    wsApoio.Range("C1:C" & ultimaLinhaApoio).ClearContents
+    
+    MsgBox "Formulário limpo com sucesso!"
+End Sub
+
+
+
