@@ -1,0 +1,30 @@
+medida de produtos concatenados com marcas por dia, a variação da quantidade deles
+Variação Quantidade = 
+VAR qtd_atual = SUM(teste[quantidade])
+VAR data_atual = MAX(teste[data])
+VAR item_atual = MAX(teste[Personalizar])
+
+VAR data_anterior =
+    CALCULATE(
+        MAX(teste[data]);
+        FILTER(
+            ALL(teste);
+            teste[data] < data_atual &&
+            teste[Personalizar] = item_atual
+        )
+    )
+
+VAR qtd_anterior =
+    CALCULATE(
+        SUM(teste[quantidade]);
+        FILTER(
+            ALL(teste);
+            teste[data] = data_anterior &&
+            teste[Personalizar] = item_atual
+        )
+    )
+
+VAR variacao = qtd_atual - qtd_anterior
+
+RETURN
+IF(ISBLANK(qtd_anterior) || variacao < 0; 0; variacao)
