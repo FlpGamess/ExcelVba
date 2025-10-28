@@ -40,3 +40,19 @@ IF(
     RETURN
         IF(ISBLANK(qtd_anterior) || variacao < 0; 0; variacao)
 )
+
+
+
+------------------------------
+
+Quantidade Último Dia = 
+VAR DataRecente =
+    CALCULATE(
+        MAX(teste[data]);
+        ALLSELECTED(teste[data])  -- respeita o filtro do que foi selecionado
+    )
+RETURN
+CALCULATE(
+    SUM(teste[quantidade]);
+    teste[data] = DataRecente
+)
