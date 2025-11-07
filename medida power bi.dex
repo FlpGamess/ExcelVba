@@ -1,44 +1,53 @@
-Variação Quantidade (7 dias dinâmico) = 
-VAR data_maxima = CALCULATE(MAX(teste[data]); ALLSELECTED(teste))
-VAR limite_inferior = data_maxima - 6   -- 7 dias contando o atual
-VAR data_atual = MAX(teste[data])
-VAR item_atual = MAX(teste[Personalizar])
+Status Produto = 
+VAR DataMaisRecente =
+    CALCULATE(
+        MAX(teste[data]);
+        ALLSELECTED(teste)
+    )
+
+VAR DataAnterior =
+    CALCULATE(
+        MAX(teste[data]);
+        FILTER(
+            ALLSELECTED(teste);
+            teste[data] < DataMaisRecente
+        )
+    )
+
+VAR ProdutoAtual = MAX(teste[produto])
+VAR FabricanteAtual = MAX(teste[fabricante])
+
+VAR QtdAtual =
+    CALCULATE(
+        SUM(teste[quantidade]);
+        FILTER(
+            teste;
+            teste[produto] = ProdutoAtual &&
+            teste[fabricante] = FabricanteAtual &&
+            teste[data] = DataMaisRecente
+        )
+    )
+
+VAR QtdAnterior =
+    CALCULATE(
+        SUM(teste[quantidade]);
+        FILTER(
+            teste;
+            teste[produto] = ProdutoAtual &&
+            teste[fabricante] = FabricanteAtual &&
+            teste[data] = DataAnterior
+        )
+    )
 
 RETURN
 IF(
-    data_atual < limite_inferior || data_atual > data_maxima;
-    BLANK();
-    VAR qtd_atual =
-        CALCULATE(
-            SUM(teste[quantidade]);
-            FILTER(
-                ALLSELECTED(teste);
-                teste[data] = data_atual &&
-                teste[Personalizar] = item_atual
-            )
-        )
-    VAR data_anterior =
-        CALCULATE(
-            MAX(teste[data]);
-            FILTER(
-                ALLSELECTED(teste);
-                teste[data] < data_atual &&
-                teste[Personalizar] = item_atual &&
-                teste[data] >= limite_inferior
-            )
-        )
-    VAR qtd_anterior =
-        CALCULATE(
-            SUM(teste[quantidade]);
-            FILTER(
-                ALLSELECTED(teste);
-                teste[data] = data_anterior &&
-                teste[Personalizar] = item_atual
-            )
-        )
-    VAR variacao = qtd_atual - qtd_anterior
-    RETURN
-        IF(ISBLANK(qtd_anterior) || variacao < 0; 0; variacao)
+    ISBLANK(QtdAtual);
+    BLANK();  -- ignora se o produto não existe no último dia real
+    IF(
+        ISBLANK(QtdAnterior) || QtdAtual > QtdAnterior;
+        "Bombou 💥";
+        "Sobrou 💤"
+    )
 )
 
 
@@ -46,13 +55,17 @@ IF(
 ------------------------------
 
 Quantidade Último Dia = 
-VAR DataRecente =
+VAR DataMaisRecenteGlobal =
     CALCULATE(
         MAX(teste[data]);
-        ALLSELECTED(teste[data])  -- respeita o filtro do que foi selecionado
+        ALLSELECTED(teste)
     )
 RETURN
 CALCULATE(
     SUM(teste[quantidade]);
-    teste[data] = DataRecente
+    FILTER(
+        teste;
+        teste[data] = DataMaisRecenteGlobal
+    )
 )
+
