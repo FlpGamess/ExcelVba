@@ -1,0 +1,52 @@
+Option Explicit ' força declaração de variáveis (evita erros de digitação)
+
+Function indicadorPro(celulaAtual As Range, _
+                      Optional passos As Long = 5, _
+                      Optional minimoR As Long = 2) As String
+    ' celulaAtual → célula onde a fórmula está (ex: K2)
+    ' passos → quantos saltos de -2 colunas verificar (padrão = 5)
+    ' minimoR → quantidade mínima de "R" para retornar "R" (padrão = 2)
+    ' retorno da função é texto ("R" ou "V")
+    
+    Dim colAtual As Long      ' guarda a coluna da célula atual
+    Dim linhaAtual As Long    ' guarda a linha da célula atual
+    Dim i As Long             ' contador do loop
+    Dim contador As Long      ' conta quantos "R" foram encontrados
+    Dim ws As Worksheet       ' referência da planilha
+    
+    ' 🔒 segurança: se não veio célula válida, retorna "V"
+    If celulaAtual Is Nothing Then
+        indicadorPro = "V"
+        Exit Function
+    End If
+    
+    ' captura a planilha e posição da célula
+    Set ws = celulaAtual.Worksheet
+    colAtual = celulaAtual.Column
+    linhaAtual = celulaAtual.Row
+    contador = 0
+    
+    ' 🔁 percorre para a esquerda de -2 em -2 colunas
+    For i = 1 To passos
+        
+        ' 🛑 evita passar da coluna A
+        If colAtual - (i * 2) <= 0 Then Exit For
+        
+        ' 🔍 verifica se a célula analisada contém "R"
+        If ws.Cells(linhaAtual, colAtual - (i * 2)).Value2 = "R" Then
+            contador = contador + 1
+            
+            ' 🚀 early exit: se já atingiu o mínimo necessário,
+            ' retorna "R" imediatamente (ganho de performance)
+            If contador >= minimoR Then
+                indicadorPro = "R"
+                Exit Function
+            End If
+        End If
+        
+    Next i
+    
+    ' ❌ se terminou o loop sem atingir o mínimo, retorna "V"
+    indicadorPro = "V"
+
+End Function
