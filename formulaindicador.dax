@@ -1,0 +1,54 @@
+Indicador Caso = 
+VAR SemanaSelecionada =
+    IF(
+        ISFILTERED(Tabela[semana]),
+        SELECTEDVALUE(Tabela[semana]),
+        CALCULATE(MAX(Tabela[semana]), ALL(Tabela))
+    )
+
+VAR NA_Count =
+    CALCULATE(
+        COUNTROWS(Tabela),
+        Tabela[status] = "na",
+        Tabela[semana] = SemanaSelecionada
+    )
+
+VAR NotOK_Count =
+    CALCULATE(
+        COUNTROWS(Tabela),
+        Tabela[status] = "not ok",
+        Tabela[semana] = SemanaSelecionada
+    )
+
+RETURN
+SWITCH(
+    TRUE(),
+    NA_Count >= 2, "na",
+    NotOK_Count >= 2, "not ok",
+    "ok"
+)
+
+
+
+
+
+
+  Indicador Status = 
+VAR TabelaResumo =
+    ADDCOLUMNS(
+        SUMMARIZE(
+            Tabela,
+            Tabela[vcp],
+            Tabela[turno],
+            Tabela[caso]
+        ),
+        "StatusFinal", [Indicador Caso]
+    )
+
+RETURN
+COUNTROWS(
+    FILTER(
+        TabelaResumo,
+        [StatusFinal] = SELECTEDVALUE(Tabela[status])
+    )
+)
