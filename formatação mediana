@@ -1,0 +1,7 @@
+verde
+=ABS(B1 - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) /   (PROCV(A1;Planilha2!A:C;3;FALSO) - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) <= 0,75
+amarelo
+=E( ABS(B1 - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) /  (PROCV(A1;Planilha2!A:C;3;FALSO) - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) > 0,75;  ABS(B1 - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) /  (PROCV(A1;Planilha2!A:C;3;FALSO) - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) <= 1 )
+
+vermelho
+=ABS(B1 - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) /  (PROCV(A1;Planilha2!A:C;3;FALSO) - ((PROCV(A1;Planilha2!A:C;2;FALSO)+PROCV(A1;Planilha2!A:C;3;FALSO))/2)) > 1
